@@ -12,4 +12,4 @@ Original authors: see file `AUTHORS`
 
 License: see file `LICENSE`
 
-
+All original documentation, READMEs etc are now in subdirectory `doc-orig`
