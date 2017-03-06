@@ -1,0 +1,125 @@
+BODY {
+       background-color: #ffffff;
+       align:left;
+       font-weight: normal;
+       font-size: 12pt;
+       font-height: 14pt;
+       font-family: helvetica;
+       }
+
+
+h1                      { 
+                          color: #333333;
+                          font-weight: bold;
+                          border-style: solid;
+                          border-color: #9999cc;
+                          border-width: 0 thick thin 0 ;   
+                          padding: 0.3ex 2.4ex 0.3ex 1.2ex;
+
+ }
+
+h2                      { border-style: solid;
+                          border-color: #9999cc;
+                          border-width: 0 0 0 thick;   
+                          padding: 0.3ex 1.2ex 0.3ex 1.2ex;
+                          color: #036;  background: white;  font-weight: bold; }
+
+h3 {
+       background-color: #ccccff;
+       font-weight: normal;
+       font-size: 14pt;
+       font-height: 14pt;
+       text-indent:3%;
+       }
+li {
+       font-weight: normal;
+       font-size: 12pt;
+       font-height: 12pt;
+       font-family: helvetica;
+       font-variant: normal;
+       font-style: normal;
+         }
+STRONG{
+           color:red
+           }
+EM{
+           color:red
+           }
+A {
+           text-decoration: none
+           }
+A:link {
+          color: blue
+           }  
+A:visited {
+           color: maroon
+           } 
+A:hover {
+           text-decoration: underline
+           }     
+A:active {
+           color: red
+           }
+HR {
+           align:center
+           }
+P{
+       font-weight: normal;
+       font-size: 12pt;
+       font-height: 12pt;
+       font-family: helvetica;
+       margin-left:5%;
+       margin-right:5%
+	   }
+BLOCKQUOTE{
+  white-space:  pre;
+  padding:      0.5em;
+  border-color: #9999cc;
+  border-style: outset;
+  border-width: 4px;
+  margin-left:12%;
+  margin-right:12%;
+}
+IMG {
+           border:0
+           }
+ABBR {
+           font-weight: bold;
+           color:gray
+	   }
+ACRONYM {
+           font-weight: bold;
+           color:gray
+	   }
+DIV {
+       font-weight: normal;
+       font-size: 10pt;
+       font-height: 10pt;
+       font-family: helvetica;
+}
+
+p.lang-navigator {
+       font-weight: normal;
+       font-size: 10pt;
+       font-height: 10pt;
+       margin-left:0%
+
+}
+ADDRESS {
+       font-weight: normal;
+       font-size: 10pt;
+       font-height: 10pt;
+       font-family: helvetica;
+}
+
+table{ border: 1px; solid #9999cc;}
+th, td { }
+pre { 
+  white-space:  pre;
+  padding:      0.5em;
+  border-color: #9999cc;
+  border-style: outset;
+  border-width: 4px;
+  margin-left:15%;
+  margin-right:15%;
+}

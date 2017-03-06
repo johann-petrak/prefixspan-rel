@@ -1,0 +1,537 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+  <meta http-equiv="content-type" content="text/html; charset=iso-2022-jp">
+  <meta http-equiv="Content-Style-Type" content="text/css">
+  <meta http-equiv="Author" CONTENT="Masayuki Asahara">
+  <meta name="description" content="index">
+  <link rel=stylesheet href="./masayu-a.css">
+  <title>PrefixSpan-rel -- a sequence pattern miner</title>
+</head>
+<hr>
+<h1>PrefixSpan-rel -- 系列パターンマイニングツール</h1>
+<hr>
+<h2>はじめに</h2>
+<p>
+系列パターンマイニングとは、頻出する部分系列パターンを高速に抽出する方法の総称です。
+やみくもに系列パターンマイニングを行うと不要なパターンも出力されます。
+本プログラムでは連続系列と不連続系列との出力を制御する (modified prefixspan)ことにより、n 項関係抽出に適したマイニングを行うことができます。
+</p>
+<hr>
+<h2>新着情報</h2>
+<ul>
+<li>2015-01-04 (Mon) prefixspan-rel-1.3 リリース<br>
+    -r オプションの追加。(reduplication パターンのみの filtering)<br>
+    -R オプションの追加。(reduplication パターンの拡張（連濁、踊り字対応))
+<li>2007-09-07 (Fri) prefixspan-rel-1.2 リリース<br>
+    -x オプションの追加。(パターン「a // b」の // の部分には a も b も入らない）
+<li>2007-08-09 (Thu) prefixspan-rel-1.1 リリース<br>
+    -m minpat オプションのバグを修正。
+<li>2007-07-27 (Fri) prefixspan-rel-1.0 リリース<br>
+    数え方のヴァリエーションを増やしました。
+</ul>
+<hr>
+<h2>ダウンロード</h2>
+<p>
+<ul>
+<li><a href="http://sourceforge.jp/projects/prefixspan-rel/">prefixspan-rel</a>
+<p>
+Windows で利用可能な exe ファイルがパッケージの中に含まれています。
+</p>
+</ul>
+<hr>
+<h2>利用方法</h2>
+<h3>数え方</h3>
+<p>
+以下のような系列データがあるとする：
+</p>
+<pre>
+a b c a b c
+a b d a b c
+a c d a b c
+a b c d a b c
+a b c d a b c
+</pre>
+<p>
+頻度４以上の部分系列(type)を枚挙するには以下のようにする：
+</p>
+<pre>
+実行例：
+% prefixspan -m 4 &lt; data2
+a/5 b/4 // a/4 b/4 c/4
+a/5 b/4 // a/4 // c/4
+a/5 b/4 // b/4 c/4
+a/5 b/4 // c/4
+...
+</pre>
+<p>
+結果の中で &quot;//&quot;は、前後の要素の間に１つ以上の他の要素が入っていることを表わす。この他の要素が入っている部分をギャップと呼ぶ。
+-s オプションを用いることにより出力する系列中の最小ギャップ数を、
+-S オプションを用いることにより出力する系列中の最大ギャップ数を変更することができる。
+次の例では、ギャップ数がちょうど１である系列を出力する。
+これは頻出する２つ組の枚挙を適す：
+</p>
+<pre>
+実行例：
+% prefixspan -m 4 -s 1 -S 1 &lt; data2
+a/5 b/4 // a/4 b/4 c/4
+a/5 b/4 // b/4 c/4
+a/5 b/4 // c/4
+a/5 // a/5 b/5 c/5
+a/5 // b/5 c/5
+a/5 // c/5
+a/5 // d/4 a/4 b/4 c/4
+b/5 // a/4 b/4 c/4
+b/5 // b/4 c/4
+b/5 // c/4
+c/5 // b/4 c/4
+c/5 // c/4
+d/4 a/4 // c/4
+d/4 // b/4 c/4
+d/4 // c/4
+</pre>
+<p>
+-S オプションを用いることにより、連続 ngram のみの抽出をすることができる：
+</p>
+<pre>
+実行例：
+% prefixspan -m 4 -S 0 &lt; data2
+a/5 b/4
+b/5 c/4
+c/5
+d/4 a/4 b/4 c/4
+</pre>
+<p>
+ギャップの中の要素が多い場合、つまりギャップの前後の２要素があまりにも離れている場合、
+あまり関連性のない系列であることがある。ギャップ中の要素を制御するために
+-g オプションを用いることにより最小ギャップ長を、
+-G オプションを用いることにより最大ギャップ長を変更することができる。
+次の例では、ギャップ長がちょうど１である系列を出力する：
+</p>
+<pre>
+実行例：
+% prefixspan -m 4 -g 1 -G 1 -s 1 -S 1 &lt; data2
+d/4 a/4 // c/4
+d/4 // b/4 c/4
+</pre>　
+<p>
+上記例では、１行内に同じパターンが n (n>1)回出現しても１回として数えている。
+１行内に同じパターンが n (n>1)回出現した場合に n 回として数える
+（tokenごとに数える）には、以下のようにする：
+</p>
+<pre>
+実行例：
+% prefixspan -m 7 -c token &lt; data2
+a/10 b/9 c/8
+a/10 // c/13
+b/9 c/8
+c/9
+</pre>　　
+<p>
+ここでは頻度 7 回以上のものを出力している。
+結果をよくみると隣接する a-b と、隣接しない a-b とを別々に数えているのがわかる。
+隣接する 2 要素の間にも「長さ 0 のギャップがある」として、ギャップがあるものと一緒に数えたい場合には -0 オプションを用いる：
+</p>
+<pre>
+実行例：
+% prefixspan -m 7 -c token -0 &lt; data2
+a/10 b/9 c/8
+a/10 b/9 // c/12
+a/10 // b/14 c/13
+a/10 // b/14 // c/17
+a/10 // c/14
+b/9 c/8
+b/9 // c/12
+c/9
+</pre>
+
+<p>
+まとめると以下の表のような数え方がある：
+</p>
+
+<table border="1">
+<tr><th></th><th>連続 ngram のみ</th><th>2つ組抽出</th><th>2つ組抽出(長さ 0 のギャップを許す)</th><th>2つ組抽出(ギャップの最大長は 3) </th></tr>
+<tr><th>tokenごと<br>(１行内に同じパターンが<br> n (n>1)回出現すると<br> n 回として数える)</th><td>-c token -S 0</td><td>-c token -s 1 -S 1</td><td>-c token -s 1 -S 1 -0</td><td>-c token -s 1 -S 1 -G 3</td></tr>
+<tr><th>typeごと<br>(１行内に同じパターンが<br> n (n>1)回出現しても<br>１回として数える)</th><td> -S 0</td><td>-s 1 -S 0</td><td> -s 1 -S 1 -0</td><td> -s 1 -S 1 -G 3</td></tr>
+</table>
+<h3>出力フォーマット</h3>
+<p>
+default では、右最大パターンのみ出力する。
+-a オプションを用いることにより、全パターンを出力する:
+</p>
+<pre>
+実行例：
+% prefixspan -m 5 &lt; data2
+a/5 // a/5 b/5 c/5
+a/5 // a/5 // c/5
+a/5 // b/5 c/5
+a/5 // c/5
+b/5
+c/5
+% prefixspan -a -m 5 &lt; data2
+5 a
+5 a // a
+5 a // a b
+5 a // a b c
+5 a // a // c
+5 a // b
+5 a // b c
+5 a // c
+5 b
+5 c
+</pre>
+<p>
+-w オプションを用いることにより、出現場所を出力する:
+</p>
+<pre>
+実行例：
+% prefixspan -w -m 3 -S 1 -G 1 &lt; data2
+&lt;pattern&gt;
+&lt;what&gt;a/5 b/4 c/3&lt;/what&gt;
+&lt;where&gt;0 3 4&lt;/where&gt;
+&lt;/pattern&gt;
+&lt;pattern&gt;
+&lt;what&gt;a/5 c/0 c/3&lt;/what&gt;
+&lt;where&gt;0 3 4&lt;/where&gt;
+&lt;/pattern&gt;
+&lt;pattern&gt;
+&lt;what&gt;b/5 c/4&lt;/what&gt;
+&lt;where&gt;0 2 3 4&lt;/where&gt;
+&lt;/pattern&gt;
+&lt;pattern&gt;
+&lt;what&gt;c/5 d/3 a/3 b/3 c/3&lt;/what&gt;
+&lt;where&gt;2 3 4&lt;/where&gt;
+&lt;/pattern&gt;
+&lt;pattern&gt;
+&lt;what&gt;c/5 d/3 a/3 c/0 c/3&lt;/what&gt;
+&lt;where&gt;2 3 4&lt;/where&gt;
+&lt;/pattern&gt;
+&lt;pattern&gt;
+&lt;what&gt;c/5 d/3 b/0 b/3 c/3&lt;/what&gt;
+&lt;where&gt;2 3 4&lt;/where&gt;
+&lt;/pattern&gt;
+&lt;pattern&gt;
+&lt;what&gt;c/5 a/0 a/3 b/3 c/3&lt;/what&gt;
+&lt;where&gt;2 3 4&lt;/where&gt;
+&lt;/pattern&gt;
+&lt;pattern&gt;
+&lt;what&gt;d/4 a/4 b/4 c/4&lt;/what&gt;
+&lt;where&gt;1 2 3 4&lt;/where&gt;
+&lt;/pattern&gt;
+&lt;pattern&gt;
+&lt;what&gt;d/4 a/4 c/0 c/4&lt;/what&gt;
+&lt;where&gt;1 2 3 4&lt;/where&gt;
+&lt;/pattern&gt;
+&lt;pattern&gt;
+&lt;what&gt;d/4 b/0 b/4 c/4&lt;/what&gt;
+&lt;where&gt;1 2 3 4&lt;/where&gt;
+&lt;/pattern&gt;
+</pre>
+<p>
+-a と -w オプションを同時に用いることもできる：
+</p>
+<pre>
+実行例：
+% prefixspan -a -w -m 4 -S 1 -G 1 &lt; data2 
+&lt;pattern&gt;
+&lt;freq&gt;5&lt;/freq&gt;
+&lt;what&gt;a&lt;/what&gt;
+&lt;where&gt;0 1 2 3 4&lt;/where&gt;
+&lt;/pattern&gt;
+&lt;pattern&gt;
+&lt;freq&gt;4&lt;/freq&gt;
+&lt;what&gt;a b&lt;/what&gt;
+&lt;where&gt;0 1 3 4&lt;/where&gt;
+&lt;/pattern&gt;
+&lt;pattern&gt;
+&lt;freq&gt;5&lt;/freq&gt;
+&lt;what&gt;b&lt;/what&gt;
+&lt;where&gt;0 1 2 3 4&lt;/where&gt;
+&lt;/pattern&gt;
+&lt;pattern&gt;
+&lt;freq&gt;4&lt;/freq&gt;
+&lt;what&gt;b c&lt;/what&gt;
+&lt;where&gt;0 2 3 4&lt;/where&gt;
+&lt;/pattern&gt;
+&lt;pattern&gt;
+&lt;freq&gt;5&lt;/freq&gt;
+&lt;what&gt;c&lt;/what&gt;
+&lt;where&gt;0 1 2 3 4&lt;/where&gt;
+&lt;/pattern&gt;
+&lt;pattern&gt;
+&lt;freq&gt;4&lt;/freq&gt;
+&lt;what&gt;d&lt;/what&gt;
+&lt;where&gt;1 2 3 4&lt;/where&gt;
+&lt;/pattern&gt;
+&lt;pattern&gt;
+&lt;freq&gt;4&lt;/freq&gt;
+&lt;what&gt;d a&lt;/what&gt;
+&lt;where&gt;1 2 3 4&lt;/where&gt;
+&lt;/pattern&gt;
+&lt;pattern&gt;
+&lt;freq&gt;4&lt;/freq&gt;
+&lt;what&gt;d a b&lt;/what&gt;
+&lt;where&gt;1 2 3 4&lt;/where&gt;
+&lt;/pattern&gt;
+&lt;pattern&gt;
+&lt;freq&gt;4&lt;/freq&gt;
+&lt;what&gt;d a b c&lt;/what&gt;
+&lt;where&gt;1 2 3 4&lt;/where&gt;
+&lt;/pattern&gt;
+&lt;pattern&gt;
+&lt;freq&gt;4&lt;/freq&gt;
+&lt;what&gt;d a // c&lt;/what&gt;
+&lt;where&gt;1 2 3 4&lt;/where&gt;
+&lt;/pattern&gt;
+&lt;pattern&gt;
+&lt;freq&gt;4&lt;/freq&gt;
+&lt;what&gt;d // b&lt;/what&gt;
+&lt;where&gt;1 2 3 4&lt;/where&gt;
+&lt;/pattern&gt;
+&lt;pattern&gt;
+&lt;freq&gt;4&lt;/freq&gt;
+&lt;what&gt;d // b c&lt;/what&gt;
+&lt;where&gt;1 2 3 4&lt;/where&gt;
+&lt;/pattern&gt;
+</pre>
+<h3>ストップワード</h3>
+<p>
+数え飛ばしたい要素をファイルに書き出しておく(例えば stopwords)。
+-k オプションにより、このファイルを指定しておくことにより、その要素を読み飛ばす：
+</p>
+<pre>
+実行例：c
+% cat stopwords
+a
+c
+% prefixspan -k stopwords < data2
+b/5 d/1 // b/1
+b/5 // b/4
+b/5 // d/2 // b/2
+d/4 // b/4
+</pre>
+<h3>確率モデルや共起尺度を取る際の注意点</h3>
+<pre>
+a c b a c b
+a b a b
+a c b a b
+a b a c b
+a c a c
+</pre>
+<p>
+の中に 「a // b」 というパターンはいくつあるだろうか？
+</p>
+<p>
+行単位に数えると：
+</p>
+<pre>
+% prefixspan < data3 
+...
+a/5 // b/4 ...
+...
+</pre>
+<p>
+パターン単位に数えると（「a // b」と 「a b」 は区別して数え、「a // b」の &quot;//&quot;は &quot;a&quot; でも &quot;b&quot; でも可能）：
+</p>
+<pre>
+% prefixspan -c token < data3 
+...
+a/10 // b/8 ...
+...
+</pre>
+<p>
+パターン単位に数えると（「a // b」と 「a b」 は区別して数え、「a // b」の &quot;//&quot;はかならず &quot;a&quot; でも &quot;b&quot; 以外）：
+</p>
+<pre>
+% prefixspan -c token -x < data3 
+...
+a/10 // b/4 ...
+...
+</pre>
+<p>
+パターン単位に数えると（「a // b」と 「a b」 は同じとして数え、「a // b」の &quot;//&quot;は &quot;a&quot; でも &quot;b&quot; でも可能）：
+</p>
+<pre>
+% prefixspan -c token -0 < data3 
+...
+a/10 // b/12 ...
+...
+</pre>
+<p>
+パターン単位に数えると（「a // b」と 「a b」 は同じとして数え、「a // b」の &quot;//&quot;はかならず &quot;a&quot; でも &quot;b&quot; 以外）：
+</p>
+<pre>
+% prefixspan -c token -x -0 < data3 
+...
+a/10 // b/8 ...
+...
+</pre>
+<p>
+このうちパターン単位でとびとびに数えると、
+&quot;a&quot;に対して 2 以上の &quot;a//b&quot;が可能であったり、&quot;a b&quot;が複数回数えられる場合があるため、確率モデルや共起尺度を得るための基礎データとして不向きな数え方もある。まとめると以下のようになる：
+</p>
+<table>
+<tr><th>数える単位</th>
+    <th>数え方</th>
+    <th>オプション</th>
+    <th>P(&quot;a//b&quot;|&quot;a&quot;) </th>
+    <th>注意点</th>
+</tr>
+<tr><td>行単位</td>
+    <td></td>
+    <td></td>
+    <td>4/5</td>
+    <td></td>
+</tr>
+<tr><td>パターン単位</td>
+    <td>「a // b」と 「a b」 は区別して数え、「a // b」の &quot;//&quot;は &quot;a&quot; でも &quot;b&quot; でも可能</td>
+    <td>-c token</td>
+    <td>8/10</td>
+    <td>&quot;a&quot;に対して、2 以上の &quot;a//b&quot;が可能</td>
+</tr>
+<tr><td>パターン単位</td>
+    <td>「a // b」と 「a b」 は区別して数え、「a // b」の &quot;//&quot;はかならず &quot;a&quot; でも &quot;b&quot; 以外：</td>
+    <td>-c token -x</td>
+    <td>4/10</td>
+    <td></td>
+</tr>
+<tr><td>パターン単位</td>
+    <td>「a // b」と 「a b」 は同じとして数え、「a // b」の &quot;//&quot;は &quot;a&quot; でも &quot;b&quot; でも可能</td>
+    <td>-c token -0</td>
+    <td>12/10</td>
+    <td>&quot;a&quot;に対して、2 以上の &quot;a//b&quot;が可能、&quot;a b&quot;は複数回数えられる場合がある</td>
+</tr>
+<tr><td>パターン単位</td>
+    <td>「a // b」と 「a b」 は同じとして数え、「a // b」の &quot;//&quot;はかならず &quot;a&quot; でも &quot;b&quot; 以外：</td>
+    <td>-c token -x -0</td>
+    <td>8/10</td>
+    <td>&quot;a b&quot;は複数回数えられる場合がある</td>
+</tr>
+</table>
+<h3>畳語対応(reduplication)</h3>
+<p>-rオプションで、「かくかく」などの畳語のみを展開する。必ず -a オプションと一緒に使うこと。
+</p>
+<pre>
+% prefixspan -r -a  < data4
+1 a b a b
+1 a c a c
+1 a c b a c b
+1 a // b a // b
+2 々 々
+1 あ か あ か
+1 か あ か あ
+1 後 手 後 手
+</pre>
+<p>-Rオプションで、「々」など踊り字や「さんざん」のような後半要素の先頭要素が前半要素の濁音化した語を展開するようになる。踊り字や濁音化の規則は redupfile などを参考に記述すること。必ず -a オプションと一緒に使うこと。
+</p>
+<pre>
+% prefixspan -R redupfile -a -S 0 < data4
+1 a b a b
+1 a c a c
+1 a c b a c b
+2 々 々
+1 あ か あ か
+1 い き い ぎ
+1 か あ か あ
+1 き い ぎ い
+1 す ゝ
+1 す ゞ
+1 づ ゝ
+1 ぶ ゞ
+1 分 々
+1 後 手 後 手
+1 早 々
+1 裸 々
+1 複 々
+1 部 分 々 々
+</pre>
+<p>
+redupfile に
+「々	々」と記述がある場合（タブ区切りで同じ要素を2つ記述した場合）後半要素に列挙される踊り字として扱う。<br>
+redupfile に
+「か	が」と記述がある場合（タブ区切りで同じ要素を2つ記述した場合）後半の先頭要素が前半の先頭要素の連濁関係にあることを許して展開する。
+以下がredupfile のサンプルである。
+</p>
+<pre>
+々	々
+ゝ	ゝ
+ゞ	ゞ
+ヽ	ヽ
+ヾ	ヾ
+か	が
+き	ぎ
+く	ぐ
+け	げ
+こ	ご
+さ	ざ
+し	じ
+す	ず
+せ	ぜ
+そ	ぞ
+た	だ
+ち	ぢ
+つ	づ
+て	で
+と	ど
+は	ば
+ひ	び
+ふ	ぶ
+へ	べ
+ほ	ぼ
+</pre>
+<p>
+使用例：
+<ul>
+<li><a href="https://docs.google.com/spreadsheets/d/1STnryC5qH5W8Y7ekE9RtGZOEkNb96lGFM0UDngYVAHc/edit?usp=sharing">BCCWJ (ver 1.0)</a>-R redupfile -a -S 0
+<li><a href="https://docs.google.com/spreadsheets/d/1F4QCaWPiWP51WzQj0vVqegbkMBdcV4XuZRuilKk2jzI/edit?usp=sharing">超大規模コーパス (2012-4Q)</a>-R redupfile -a -S 0 -L 12
+</ul>
+</p>
+<h3>オプション</h3>
+<ul>
+<li>-m (int): minimal support 最小出現数
+<li>-M (int): パターンの最小長
+<li>-L (int): パターンの最大長
+<li>-s (int): 最小ギャップ数
+<li>-S (int): 最大ギャップ数
+<li>-g (int): 最小ギャップ長
+<li>-G (int): 最大ギャップ長
+<li>-r: 畳語対応 (-a と一緒に使うこと)
+<li>-R(ファイル名): 拡張畳語対応 (-a と一緒に使うこと)<br>
+指定するファイル名(redupfile)に列挙した要素考慮した畳語展開。<br>
+「々	々」と記述がある場合（タブ区切りで同じ要素を2つ記述した場合）後半要素に列挙される踊り字として扱う。<br>
+「か	が」と記述がある場合（タブ区切りで同じ要素を2つ記述した場合）後半の先頭要素が前半の先頭要素の連濁関係にあることを許して展開する。
+<li>-a: 全出力パターンを出力する（右最大パターン以外も出力する）
+<li>-w: 出現場所を出力する
+<li>-v: Verbose mode
+<li>-t: 入力するデータのフォーマット
+<li>-d (string): 出力する際のデリミタ
+<li>-c [type|token]: type ごとに数える（＝行単位におなじパターンがn (n>1)回出現しても1回として数える）か、token ごとに数える（＝行単位におなじパターンがn (n>1)回出現するとn回として数える）か<br>
+default は type
+<li>-0: 指定すると隣接する２要素間も長さ 0 のギャップとして数える（この場合隣接要素は、ギャップがある場合としてもギャップがない場合としても数える）<br>
+default は指定しない
+<li>-x: パターン「a // b」の &quot;//&quot; の部分に a や b の出現を許さない
+<li>-k (ファイル名): stopword の指定<br>
+指定するファイル名に列挙した要素を stopword とみなし、飛ばして数える
+</ul>
+<hr>
+<h2>Bibliography</h2>
+<ul>
+<li><a name="bib:Pei2001">[1]</a>
+J. Pei, J. Han, B. Mortazavi-Asl, H. Pinto, Q. Chen, U. Dayal and M-C. Hsu. &quot;PrefixSpan: Mining Sequential Patterns Efficiently by PrefixProjected Pattern Growth&quot;. In. Proc. 2001 Int. Conf. Data Engineering (ICDE'01), pages 215-224, Heidelberg, Germany, April 2001.
+<li><a name="bib:Kitakami2002">[2]</a>
+H. Kitakami, T. Kanbara, Y. Mori, S. Kuroki, Y. Yamazaki: &quot;Modified PrefixSpan Method for Motif Discovery in Sequence Databases&quot;. PRICAI 2002: 482-491, 2002.
+</ul>
+<hr>
+<h2>謝辞</h2>
+<ul>
+<li>
+<a href="http://www.chasen.org/~taku/software/prefixspan/">オリジナルのプログラム</a>を開発した工藤拓氏に感謝します。
+<li>開発段階において多くのコメントをいただいた松本研究室の皆さまに感謝します。
+</ul>
+<hr>
+<br>
+<address>
+ <a href="mailto:masayu-a@is.naist.jp">masayu-a@is.naist.jp</a>
+</address>
+</body>
+</html>

@@ -1,0 +1,40 @@
+<pattern>
+<what>a/5 b/4 c/3</what>
+<where>0 3 4</where>
+</pattern>
+<pattern>
+<what>a/5 // c/3</what>
+<where>0 3 4</where>
+</pattern>
+<pattern>
+<what>b/5 c/4</what>
+<where>0 2 3 4</where>
+</pattern>
+<pattern>
+<what>c/5 d/3 a/3 b/3 c/3</what>
+<where>2 3 4</where>
+</pattern>
+<pattern>
+<what>c/5 d/3 a/3 // c/3</what>
+<where>2 3 4</where>
+</pattern>
+<pattern>
+<what>c/5 d/3 // b/3 c/3</what>
+<where>2 3 4</where>
+</pattern>
+<pattern>
+<what>c/5 // a/3 b/3 c/3</what>
+<where>2 3 4</where>
+</pattern>
+<pattern>
+<what>d/4 a/4 b/4 c/4</what>
+<where>1 2 3 4</where>
+</pattern>
+<pattern>
+<what>d/4 a/4 // c/4</what>
+<where>1 2 3 4</where>
+</pattern>
+<pattern>
+<what>d/4 // b/4 c/4</what>
+<where>1 2 3 4</where>
+</pattern>

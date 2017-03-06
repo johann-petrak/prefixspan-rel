@@ -1,0 +1,60 @@
+<pattern>
+<freq>5</freq>
+<what>a</what>
+<where>0 1 2 3 4</where>
+</pattern>
+<pattern>
+<freq>4</freq>
+<what>a b</what>
+<where>0 1 3 4</where>
+</pattern>
+<pattern>
+<freq>5</freq>
+<what>b</what>
+<where>0 1 2 3 4</where>
+</pattern>
+<pattern>
+<freq>4</freq>
+<what>b c</what>
+<where>0 2 3 4</where>
+</pattern>
+<pattern>
+<freq>5</freq>
+<what>c</what>
+<where>0 1 2 3 4</where>
+</pattern>
+<pattern>
+<freq>4</freq>
+<what>d</what>
+<where>1 2 3 4</where>
+</pattern>
+<pattern>
+<freq>4</freq>
+<what>d a</what>
+<where>1 2 3 4</where>
+</pattern>
+<pattern>
+<freq>4</freq>
+<what>d a b</what>
+<where>1 2 3 4</where>
+</pattern>
+<pattern>
+<freq>4</freq>
+<what>d a b c</what>
+<where>1 2 3 4</where>
+</pattern>
+<pattern>
+<freq>4</freq>
+<what>d a // c</what>
+<where>1 2 3 4</where>
+</pattern>
+<pattern>
+<freq>4</freq>
+<what>d // b</what>
+<where>1 2 3 4</where>
+</pattern>
+<pattern>
+<freq>4</freq>
+<what>d // b c</what>
+<where>1 2 3 4</where>
+</pattern>
