@@ -1,3 +1,6 @@
+# project specific
+/prefixspan
+
 # Compiled Object files
 *.slo
 *.lo
