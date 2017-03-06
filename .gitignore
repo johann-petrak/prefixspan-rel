@@ -1,5 +1,7 @@
 # project specific
 /prefixspan
+/data/testout/*
+!/data/testout/.keepme
 
 # Compiled Object files
 *.slo
