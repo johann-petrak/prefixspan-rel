@@ -4,7 +4,7 @@ EXECPREFIX =
 VERSION = 1.3
 
 CFLAGS = -O3 -Wall
-CXXFLAGS = -O3 -Wall -Wno-deprecated
+CXXFLAGS = -O3 -Wall -Wno-deprecated -ansi
 TARGETS = prefixspan${EXEC_PREFIX}
 OBJ = prefixspan.o
 
